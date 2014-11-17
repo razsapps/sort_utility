@@ -186,4 +186,89 @@ public class SortUtility {
             }
         }
     }
+
+    /**
+     * Sorts the specified list into ascending order, according to the natural ordering of its elements. All elements
+     * in the list must implement the Comparable interface. Furthermore, all elements in the list must be mutually
+     * comparable (that is, e1.compareTo(e2) must not throw a ClassCastException for any elements e1 and e2 in the list).
+     *
+     * This sort is not stable.
+     *
+     * The specified list must be modifiable, but need not be resizable.
+     *
+     * The sorting algorithm is a quick sort. This algorithm has an average case of O(n log(n)) and a worst case of
+     * O(n^2) performance. The algorithm sorts in place thus using less memory overhead.
+     *
+     * @param list the list of comparable objects to be sorted
+     * @param startIndex This is the starting index of the list where to start quicksort
+     * @param endIndex This is the ending index of the list where to end quicksort
+     */
+    public static <T extends Comparable<? super T>> void quickSort(List<T> list, int startIndex, int endIndex) {
+        quickSort(list, new ComparableComparator<T>(), startIndex, endIndex);
+    }
+
+    /**
+     * Sorts the specified list into ascending order, according to the comparator.
+     *
+     * This sort is not stable.
+     *
+     * The specified list must be modifiable, but need not be resizable.
+     *
+     * The sorting algorithm is a quick sort. This algorithm has an average case of O(n log(n)) and a worst case of
+     * O(n^2) performance. The algorithm sorts in place thus using less memory overhead.
+     *
+     * @param list the list of comparable objects to be sorted
+     * @param comparator the comparator for the class the list specifies
+     * @param startIndex This is the starting index of the list where to start quicksort
+     * @param endIndex This is the ending index of the list where to end quicksort
+     */
+    public static <T> void quickSort(List<T> list, Comparator<T> comparator, int startIndex, int endIndex) {
+        if (list == null || list.isEmpty() || startIndex == endIndex || (endIndex - startIndex == 1))
+            return;
+        else if (endIndex >= list.size() || endIndex < 0)
+            throw new ArrayIndexOutOfBoundsException(endIndex + " is less than zero or is greater than list size: " + list.size());
+        else if (startIndex < 0)
+            throw new ArrayIndexOutOfBoundsException(startIndex + " is less than zero.");
+        else if (startIndex > endIndex)
+            throw new IllegalArgumentException("startIndex cannot be greater than endIndex");
+
+        int middleIndex = startIndex + (endIndex - startIndex)/2;
+        int pivotIndex = middleIndex;
+
+        //select the median value as the pivot index.  This is for efficiency
+        T startValue = list.get(startIndex);
+        T middleValue = list.get(middleIndex);
+        T endValue = list.get(endIndex);
+        T pivotValue = middleValue;
+        if (comparator.compare(middleValue, startValue) < 0 && comparator.compare(startValue, endValue) > 0) {
+            pivotIndex = startIndex;
+            pivotValue = startValue;
+        }
+        else if (comparator.compare(middleValue, endValue) < 0 && comparator.compare(endValue, startValue) > 0) {
+            pivotIndex = endIndex;
+            pivotValue = endValue;
+        }
+
+        Collections.swap(list, pivotIndex, endIndex);
+        int swapIndex = startIndex;
+        for (int i = startIndex; i < endIndex; i++) {
+            if (comparator.compare(list.get(i), pivotValue) < 0) {
+                Collections.swap(list, i, swapIndex);
+                swapIndex++;
+            }
+        }
+        Collections.swap(list, swapIndex, endIndex);
+
+        if (swapIndex - 1 > startIndex)
+            quickSort(list, comparator, startIndex, swapIndex - 1);
+        if (swapIndex + 1 < endIndex)
+            quickSort(list, comparator, swapIndex + 1, endIndex);
+    }
+
+    private static class ComparableComparator<T extends Comparable> implements Comparator<T> {
+        @Override
+        public int compare(T o1, T o2) {
+            return o1.compareTo(o2);
+        }
+    }
 }

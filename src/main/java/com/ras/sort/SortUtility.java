@@ -265,6 +265,28 @@ public class SortUtility {
             quickSort(list, comparator, swapIndex + 1, endIndex);
     }
 
+    public static <T extends Comparable<? super T>> void bubbleSort(List<T> list) {
+        bubbleSort(list, new ComparableComparator<T>());
+    }
+
+    public static <T> void bubbleSort(List<T> list, Comparator<T> comparator) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        boolean changes = true;
+        while (changes) {
+            changes = false;
+
+            for (int i = 1; i < list.size(); i++) {
+                if (comparator.compare(list.get(i - 1), list.get(i)) > 0) {
+                    Collections.swap(list, i -1, i);
+                    changes = true;
+                }
+            }
+        }
+    }
+
     private static class ComparableComparator<T extends Comparable> implements Comparator<T> {
         @Override
         public int compare(T o1, T o2) {
